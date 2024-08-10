@@ -1,42 +1,83 @@
-.PHONY: db-mysql-up db-mysql-down db-mysql-logs db-mysql-bash db-redis-up db-redis-down db-redis-logs db-redis-bash db-milisearch-up db-milisearch-down db-milisearch-logs db-milisearch-bash ps
+SERVICES := mysql phpmyadmin postgres mongodb redis sqlite mailpit
 
-# --------------------------------- mysql ---------------------------------
-db-mysql-up:
-	docker-compose -f database/mysql/docker-compose.yml up -d
-db-mysql-down:
-	docker-compose -f database/mysql/docker-compose.yml down
-db-mysql-logs:
-	docker-compose -f database/mysql/docker-compose.yml logs
-db-mysql-bash:
-	docker-compose -f database/mysql/docker-compose.yml exec db-mysql bash
+.PHONY: help $(SERVICES) up-% down-% stop-% restart-% logs-% ps-% shell-%
 
-# --------------------------------- redis ---------------------------------
-db-redis-up:
-	docker-compose -f database/redis/docker-compose.yml up -d
-db-redis-down:
-	docker-compose -f database/redis/docker-compose.yml down
-db-redis-logs:
-	docker-compose -f database/redis/docker-compose.yml logs
-db-redis-bash:
-	docker-compose -f database/redis/docker-compose.yml exec db-redis bash
+help: ## Display this help message
+	@echo "Available commands:"
+	@echo ""
+	@echo "make up:                  Start all containers"
+	@echo "make down:                Stop and remove all containers"
+	@echo "make stop:                Stop all containers"
+	@echo "make restart:             Restart all containers"
+	@echo "make logs:                View logs of all containers"
+	@echo "make ps:                  List all running containers"
+	@echo "make shell-<service>:     Open a shell in a specific container"
+	@echo ""
+	@echo "make up-<service>:        Start a specific service"
+	@echo "make down-<service>:      Stop and remove a specific service"
+	@echo "make stop-<service>:      Stop a specific service"
+	@echo "make restart-<service>:   Restart a specific service"
+	@echo "make logs-<service>:      View logs of a specific service"
+	@echo "make ps-<service>:        List the status of a specific service"
+	@echo ""
+	@echo "Services available: $(SERVICES)"
 
-# --------------------------------- milisearch ---------------------------------
-db-milisearch-up:
-	docker-compose -f database/milisearch/docker-compose.yml up -d
-db-milisearch-down:
-	docker-compose -f database/milisearch/docker-compose.yml down
-db-milisearch-logs:
-	docker-compose -f database/milisearch/docker-compose.yml logs
-db-milisearch-bash:
-	docker-compose -f database/milisearch/docker-compose.yml exec db-meilisearch bash
+up: ## Start all containers
+	docker-compose up -d
 
-ps:
-	docker ps -a
+down: ## Stop and remove all containers
+	docker-compose down
 
-ps-f:
-	@watch "docker ps -a"
-	# while true; do \
-    #     clear; \
-    #     docker ps -a; \
-    #     sleep 2; \
-    # done
+stop: ## Stop all containers
+	docker-compose stop
+
+restart: ## Restart all containers
+	docker-compose restart
+
+logs: ## View logs of all containers
+	docker-compose logs -f
+
+ps: ## List all running containers
+	docker-compose ps
+
+shell-%: ## Open a shell in a specific container. Usage: make shell-<service_name>
+	docker-compose exec $* /bin/sh
+
+up-%: ## Start a specific service. Usage: make up-<service_name>
+	docker-compose up -d $*
+
+down-%: ## Stop and remove a specific service. Usage: make down-<service_name>
+	docker-compose rm -sf $*
+
+stop-%: ## Stop a specific service. Usage: make stop-<service_name>
+	docker-compose stop $*
+
+restart-%: ## Restart a specific service. Usage: make restart-<service_name>
+	docker-compose restart $*
+
+logs-%: ## View logs of a specific service. Usage: make logs-<service_name>
+	docker-compose logs -f $*
+
+ps-%: ## List the status of a specific service. Usage: make ps-<service_name>
+	docker-compose ps $*
+
+mysql: ## Start MySQL and phpMyAdmin
+	make up-mysql up-phpmyadmin
+
+postgres: ## Start PostgreSQL
+	make up-postgres
+
+mongodb: ## Start MongoDB
+	make up-mongodb
+
+redis: ## Start Redis
+	make up-redis
+
+sqlite: ## Start SQLite
+	make up-sqlite
+
+mailpit: ## Start SQLite
+	make up-mailpit
+
+laravel: ## Start SQLite
+	make up-mysql up-phpmyadmin up-redis up-mailpit
