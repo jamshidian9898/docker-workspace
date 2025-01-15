@@ -1,4 +1,4 @@
-SERVICES := mysql phpmyadmin postgres mongodb redis sqlite mailpit
+SERVICES := mysql phpmyadmin postgres mongo redis sqlite mailpit localstack minio
 
 .PHONY: help $(SERVICES) up-% down-% stop-% restart-% logs-% ps-% shell-%
 
@@ -11,13 +11,13 @@ help: ## Display this help message
 	@echo "make restart:             Restart all containers"
 	@echo "make logs:                View logs of all containers"
 	@echo "make ps:                  List all running containers"
-	@echo "make shell-<service>:     Open a shell in a specific container"
 	@echo ""
 	@echo "make up-<service>:        Start a specific service"
 	@echo "make down-<service>:      Stop and remove a specific service"
 	@echo "make stop-<service>:      Stop a specific service"
 	@echo "make restart-<service>:   Restart a specific service"
 	@echo "make logs-<service>:      View logs of a specific service"
+	@echo "make shell-<service>:     Open a shell in a specific container"
 	@echo "make ps-<service>:        List the status of a specific service"
 	@echo ""
 	@echo "Services available: $(SERVICES)"
@@ -67,8 +67,8 @@ mysql: ## Start MySQL and phpMyAdmin
 postgres: ## Start PostgreSQL
 	make up-postgres
 
-mongodb: ## Start MongoDB
-	make up-mongodb
+mongo: ## Start MongoDB
+	make up-mongo
 
 redis: ## Start Redis
 	make up-redis
@@ -76,8 +76,14 @@ redis: ## Start Redis
 sqlite: ## Start SQLite
 	make up-sqlite
 
-mailpit: ## Start SQLite
+mailpit: ## Start Mailpit mail testing server
 	make up-mailpit
 
-laravel: ## Start SQLite
+localstack: ## Start LocalStack AWS services
+	make up-localstack
+
+minio: ## Start MinIO S3-compatible object storage
+	make up-minio
+
+laravel: ## Start Laravel development stack
 	make up-mysql up-phpmyadmin up-redis up-mailpit
