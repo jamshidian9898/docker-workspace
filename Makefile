@@ -1,6 +1,6 @@
 SERVICES := mysql phpmyadmin postgres mongo redis sqlite mailpit localstack minio
 
-.PHONY: help $(SERVICES) up-% down-% stop-% restart-% logs-% ps-% shell-%
+.PHONY: help $(SERVICES) up-% down-% stop-% restart-% logs-% ps-% shell-% up down restart ps logs
 
 help: ## Display this help message
 	@echo "Available commands:"
